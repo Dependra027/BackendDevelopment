@@ -1,0 +1,308 @@
+npm init -> initialising
+we can change script section in package.json
+for ex:-
+"scripts": {
+    "start":"node index.js"
+  }
+now lets install express:- npm i express
+
+lets install dotenv:- npm i dotenv
+now make .env file, here we right ports, api keys, urls to secure your application by not pushing .env file into github
+
+let save port number in .env
+PORT=3000
+
+Now to use this:-
+go to the file where you want to use this port
+
+add require :- require('dotenv').config();
+and to use:- process.env.name
+
+for example replace
+app.listen(port,()=>{
+    console.log(`app listening on port ${port}`);
+})
+to 
+app.listen(process.env.PORT,()=>{
+    console.log(`app listening on port ${port}`);
+}) 
+
+-> we are using import express statement instead of require. Import comes under module express.
+so we need to add "type":'module' in package.json
+other wise it gives error.
+
+lets make a joke array which act as a simple api, then we fill get it in the frontend part
+
+//* axios
+ ### 📦 What is **Axios**?
+
+**Axios** is a **promise-based HTTP client** for making requests to servers (APIs) from the browser or Node.js.
+
+---
+
+### ✅ **Key Features of Axios**
+
+| Feature                          | Description                                              |
+| -------------------------------- | -------------------------------------------------------- |
+| 🔄 Promise-based                 | Works seamlessly with `async/await` or `.then().catch()` |
+| 🌐 HTTP Requests                 | Supports GET, POST, PUT, DELETE, PATCH, etc.             |
+| 📥 Automatic JSON Handling       | Converts response data into JSON automatically           |
+| 🧾 Request/Response Interceptors | You can modify requests or responses globally            |
+| 🧠 Error Handling                | Axios gives detailed errors if something fails           |
+| 🔐 Supports Headers & Auth       | Allows custom headers, tokens, etc.                      |
+| 🌍 Supports CORS                 | Can work with cross-origin APIs (if backend allows it)   |
+
+---
+
+🧪 Example Usage
+
+🔹 GET Request
+
+```js
+import axios from 'axios';
+
+axios.get('https://api.example.com/data')
+  .then(response => {
+    console.log(response.data);  // the response payload
+  })
+  .catch(error => {
+    console.error(error);
+  });
+```
+🔹 POST Request
+
+```js
+axios.post('https://api.example.com/login', {
+  username: 'john',
+  password: 'secret'
+})
+.then(response => {
+  console.log(response.data);
+})
+.catch(error => {
+  console.error(error);
+});
+```
+
+### 📥 How to Install Axios
+
+```bash
+npm install axios
+```
+
+
+---
+
+### 🔁 Axios vs Fetch
+
+| Feature         | Axios                 | Fetch API                         |
+| --------------- | --------------------- | --------------------------------- |
+| Default JSON    | ✅ Auto JSON parse     | ❌ You must manually use `.json()` |
+| Error Handling  | ✅ Catches HTTP errors | ❌ Only network errors caught      |
+| Interceptors    | ✅ Yes                 | ❌ No                              |
+| Browser Support | ✅ Good                | ✅ Built-in in modern browsers     |
+
+
+
+ //* 🌐What is **CORS**?
+
+CORS stands for Cross-Origin Resource Sharing.
+-> ghr me sbko allow mtt kro, sirf jinko jante ho unhe hi kro
+
+It’s a **security feature** implemented by browsers to **control how web pages access resources from different origins**.
+
+---
+🧠 **Understanding the Problem**
+
+A **webpage** is said to be from an **origin** defined by:
+
+**Protocol** (http/https)
+**Domain** (example.com)
+**Port** (3000, 4000, etc.)
+
+So:
+
+```plaintext
+http://localhost:3000   // frontend
+http://localhost:4000   // backend
+```
+
+These are considered **different origins**.
+
+🚫 **Why CORS is Needed**
+
+Browsers **block requests** from one origin to another **by default** (for security).
+For example:
+
+```js
+// This will be blocked unless backend allows it
+axios.get("http://localhost:4000/data") 
+```
+
+The backend must **explicitly allow** requests from the frontend's origin.
+
+---
+✅ **How to Fix CORS**
+
+In a Node.js/Express backend, use the `cors` middleware:
+
+```bash
+npm install cors
+```
+
+```js
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+app.use(cors());  // allows all origins by default
+
+// OR for specific origin
+app.use(cors({ origin: 'http://localhost:3000' }));
+
+app.get('/data', (req, res) => {
+  res.json({ message: 'Hello from backend' });
+});
+```
+
+🔐 Why CORS Exists
+
+To **prevent malicious scripts** from sending requests to another site (like your bank) and accessing private data.
+
+🧪 Simple Example
+
+Without CORS:
+
+Frontend → Request to `http://localhost:4000/jokes` → ❌ **Blocked by browser**
+
+With CORS enabled on backend:
+
+Frontend → Request to `http://localhost:4000/jokes` → ✅ **Allowed**
+
+📌 Summary
+
+| Term     | Meaning                                                        |
+| -------- | -------------------------------------------------------------- |
+| **CORS** | Cross-Origin Resource Sharing                                  |
+| **Why**  | Prevent unauthorized cross-site access                         |
+| **Fix**  | Backend must send proper `Access-Control-Allow-Origin` headers |
+
+//* if you dont want to add CORS at local level, u can use proxy as well
+
+//* ⚙️ What is **Proxy** in Vite (React)?
+
+In **Vite + React** development, a **proxy** is used to **forward API requests** from the frontend (React app) to the backend (Node/Express, etc.) — especially when they're running on **different ports** (causing **CORS issues**).
+
+🔥 Why Use Proxy?
+
+Imagine:
+
+* Frontend: `http://localhost:5173`
+* Backend: `http://localhost:4000`
+
+If your React app makes an API call like:
+
+axios.get("http://localhost:4000/jokes")
+
+It will cause a **CORS error** in the browser unless the backend explicitly allows it.
+
+> ✅ Instead of setting CORS on the backend during development, Vite lets you **proxy** requests through the frontend.
+
+📁 Vite Proxy Setup (in `vite.config.js`)
+
+// vite.config.js
+export default {
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
+};
+
+
+📥 Now Use in React:
+
+
+axios.get('/api/jokes')  // Internally proxies to http://localhost:4000/jokes
+
+You no longer need to call the full backend URL, and **no CORS error will happen**.
+
+✅ Benefits of Proxy in Vite
+
+| Benefit                   | Description                                          |
+| ------------------------- | ---------------------------------------------------- |
+| 🛡️ Avoid CORS during dev | No need to modify backend CORS settings              |
+| 🧹 Cleaner API calls      | Use relative paths like `/api/jokes`                 |
+| ⚡ Faster development      | Backend and frontend stay separate but work together |
+
+---
+
+### ❗Note
+
+* This only works in **development mode** (`npm run dev`).
+* For **production**, you must configure proper **CORS headers** on the backend, or use a **reverse proxy** (like Nginx).
+
+//* Day 3rd
+we can use Moon Modeler:- is a data modeling tool for MongoDB and noSQL or can use eraser.io
+for drawing the structure of the projet
+
+//* about Modelling
+we use mongoose for Modelling
+npm i mongoose
+
+//making a model
+we need three steps to make any model
+1. import mongoose
+    *** import mongoose from "mongoose" ***
+
+2. create a schema
+   *** const userScehma= new mongoose.Schema({}) ***
+    
+3. create a model
+   *** export const User=mongoose.model("User", userSchema); ***
+
+we make model using mongoose i.e mongoose.model(); and when this model get connected to database , these file automatically run first and make a structure in mongoDB
+
+* impt point- 
+as we have declare model name as User here but in monodb it becomes plural and in small letters that is, users.
+
+*** Data Modelling :-
+Data modelling is the process of creating a conceptual representation of data, including its structure, relationships, and constraints. It involves defining the entities, attributes, and relationships within a data model, which serves as a blueprint for designing and implementing databases, data warehouses, and other data storage systems.
+
+we model data in schema
+const userSchema = new mongoose.Schema({
+  email: String,
+
+  -> we can also define object which calls mongoose superPower, this also act as a validation part
+
+  username: {
+    type: String,
+    required: true,
+    //if want name to be unique
+    unique: true,
+    // for lowercase
+    lowercase: true,
+  }
+
+  ->we can also create arrays
+  subTodos:[
+    {
+      // we can also use another model reference
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Todo',
+    },
+  ]
+
+  password: String,
+  });
+  // we can add more fields here
+
+//* to use createdAt, updateAt and all time related function ,mongoose provide as timestamp keyword
+
+const userSchema = new mongoose.Schema({},{timestamps:true});
+
+ 
