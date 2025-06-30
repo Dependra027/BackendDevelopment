@@ -305,4 +305,63 @@ const userSchema = new mongoose.Schema({
 
 const userSchema = new mongoose.Schema({},{timestamps:true});
 
+** starting backend Professionally
+
+impt point-> if we ever mae folder inside folder , git never track it, as it only tracks file. For that we make .gitKeep file, then git track the folders aswell and we can simply push them.
+
+lets make
  
+*** .gitignore  file:- 
+used to add those file which should not be pushed into github.
+You can generate the data for gitignore from any gitignore generator
+
+*** .env file ***
+used to store the environment variables. we can store the database url, api keys etc.
+
+*** package.json file ***
+used to store the project dependencies and scripts. we can install the dependencies using npm install
+
+//* Nodemon: - 
+instead manually starting your server, nodemon refresh the server every time you write code
+npm i -D nodemon
+
+"scripts": {
+    "dev": "nodemon src/index.js"
+  },
+
+adding script that use nodemon for index.js file 
+
+//* we are not going to use require method instead we are going to use import method
+
+so change the type in package.json
+"type": "module"
+
+//* we'll create some folders inside src folder
+controllers
+1. db - for writing logic for connecting databse
+2. middlewares - for codes that are required to run in between. Like if any request came and before request fullsiled by server if we want some checkings , then we use middleware. 
+3. models - for database schema
+4. routes - for defining routes
+5. services - for business logic
+6. utils - for utility functions that are required multiple times like mailing, token exchanges.
+7. validators - for validation of data
+8. helpers - for helper functions that are required multiple times like logging, error handling.
+
+//* Prettier
+prettier is a code formatter. It formats your code to follow the style guide. It is useful for maintaining a consistent code style throughout the project.
+npm i -D prettier
+
+we need to add some file manually for pretttier
+1. .prettierrc
+    {
+    "singleQuote": false,
+    "doubleQuote": true,
+    "bracketSpacing": true,
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true
+}
+
+2. .prettierignore - in which files i dont want to implement prettier
+
+
