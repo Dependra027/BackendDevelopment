@@ -364,4 +364,110 @@ we need to add some file manually for pretttier
 
 2. .prettierignore - in which files i dont want to implement prettier
 
+** Starting with MongoDB
+1. adding in to .env file
+MONGO_URI=mongodb://localhost:27017/
+2. create a db name and add in constants.js because if in future we need to change its name ,we donot require to go to all files to change the name, simply change here only.
+
+we can add db in two ways, either write directly in index.js as index.js is the one who runs first or make separate db folder and add file and import into index.js for clean coding.
+
+install mongoose, express and dotenv
+npm i mongoose express dotenv
+
+** impt point
+1. whenever we try to talk to data base, many error comes so we should use either try and catch error handling or promises.
+2. we should use async await method for promises. Because it makes code clean and easy to read.
+3. we should use middleware for error handling. Because it makes code clean and easy to read.
+
+3. importing mongoose
+   import mongoose from "mongoose";
+
+we usually create db and coonect it like
+
+ function connectDB(){}
+
+ connectDB()
+
+but instead this we can use ifi method
+    ()()
+  this means this is our function and will immediatly runs
+
+  we use async, so
+
+import mongoose from "mongoose";
+import {DB_NAME} from "./constants";
+import express from "express";
+
+const app=express()
+
+//making connection
+  ( async()=>{
+   
+    //use try catch every time u use db
+    try {
+      **connection db
+      await mongoose.connect(`${process.env.MONGO_URI}/${DB_NAME}`);
+      //using some feature of express
+      app.on("error",(error)=>{
+        console.log(error);
+        throw error
+      })
+      //we can use listen as well
+      app.listen(proces.env.PORT,()=>{
+        console.log("server is running on port 3000");
+      })
+
+    },
+    catch(error){
+      console.error("Eoor", error)
+      throw error
+    }
+  })()
+
+  some times people use ; before ifi as if the previous line doesnot have ; some how, then it will create error
+
+  ;()()
+
+** 2nd approach, making separate db file then importing in index.js
+
+import mongoose from "mongoose";
+import {DB_NAME} from "./constants";
+
+const connectDB= async()=>{
+  try {
+    //we can store the connection as well in some variables
+   const ConnectionInstance = await mongoose.connect(`${process.env.MONGO_URI}/${DB_NAME}`);
+   console.log(`\n mongoDB connected !! DB HOST: ${ConnectionInstance.connection.host}`);
+  }
+  catch(error)
+  {
+    console.error("Error", error);
+    //can also use exit method given offered process
+    process.exit(1);
+  }
+}
+
+export default connectDB;
+
+//importing in index.js
+import connectDB from "./db.js";
+
+connectDB();
+
+//**
+we should import dotenv file as well in index.js as it load all environment variable as fast as possible
+
+import dotenv from "dotenv";
+dotenv.config({
+  path: "./config.env"
+});
+
+this is a new method so we need to do some changes in package.json
+"scripts": {
+    "dev": "nodemon -r dotenv/config --experimental src/index.js"
+  },
+
+ 
+
+
 
