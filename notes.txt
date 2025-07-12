@@ -467,7 +467,130 @@ this is a new method so we need to do some changes in package.json
     "dev": "nodemon -r dotenv/config --experimental src/index.js"
   },
 
- 
+*** impt-> we use app.use() when we need to use middleware or configuration
+*** impt-> we use app.get() when we need to use route
+*** impt-> we use app.post() when we need to use route
+*** impt-> we use app.put() when we need to use route
+*** impt-> we use app.delete() when we need to use route
+*** impt-> we use app.all() when we need to use route
+
+//* cookies parser
+`cookie-parser` is a middleware in Node.js (especially used with Express.js) that **parses cookies** attached to the client request object and makes them easily accessible via `req.cookies`.
+
+### 🔧 Why Use `cookie-parser`?
+
+When a browser sends a request to a server, it includes cookies in the HTTP headers. However, in raw form, cookies are just a string, like this:
+
+```
+Cookie: token=abc123; theme=dark
+```
+
+Without `cookie-parser`, you'd need to manually parse this string to get individual cookie values. `cookie-parser` simplifies that process.
+
+---
+
+### ✅ How to Install
+
+```bash
+npm install cookie-parser
+```
+
+---
+
+### 📦 Basic Usage in Express
+
+```js
+const express = require('express');
+const cookieParser = require('cookie-parser');
+
+const app = express();
+
+// Use the middleware
+app.use(cookieParser());
+
+// Access cookies
+app.get('/', (req, res) => {
+  console.log(req.cookies); // { token: 'abc123', theme: 'dark' }
+  res.send('Cookies parsed!');
+});
+```
+
+---
+
+### 🔐 Using with a Secret (for signed cookies)
+
+```js
+app.use(cookieParser('mySecretKey'));
+
+// Setting a signed cookie
+res.cookie('token', 'abc123', { signed: true });
+
+// Accessing signed cookies
+console.log(req.signedCookies.token); // 'abc123'
+```
+
+---
+
+### 🔍 Summary
+
+| Feature        | What it does                                              |
+| -------------- | --------------------------------------------------------- |
+| Parses cookies | Parses `Cookie` header into `req.cookies`                 |
+| Signed cookies | Verifies and parses signed cookies in `req.signedCookies` |
+| Lightweight    | Doesn’t modify response unless needed                     |
+
+**Middleware in Express.js (Node.js)**
+ ✅ **Definition**
+Middleware is a function that has access to the **request (`req`)**, **response (`res`)**, and the **next middleware function** in the application’s request-response cycle.
+
+### 🔁 **Syntax**
+
+function middleware(req, res, next) {
+
+  next(); // it is a flag that pass control to the next middleware
+}
+
+**Usage in Express**
+
+app.use(middlewareFunction);
+
+**Example**
+
+const logger = (req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next(); // Proceed to next middleware/route
+};
+
+app.use(logger);
+
+**Types of Middleware**
+
+| Type                  | Purpose                                   |
+| --------------------- | ----------------------------------------- |
+| **Application-level** | Attached via `app.use()`                  |
+| **Router-level**      | Attached to Express routers               |
+| **Built-in**          | Like `express.json()`, `express.static()` |
+| **Error-handling**    | With 4 arguments: `(err, req, res, next)` |
+| **Third-party**       | Like `cookie-parser`, `morgan`, etc.      |
+
+ **Common Built-in Middleware**
+
+
+app.use(express.json());           // Parses JSON bodies
+app.use(express.urlencoded());     // Parses form data
+app.use(express.static("public")); // Serves static files
+**Why Middleware?**
+
+ Logging
+ Authentication
+ Body parsing
+ Error handling
+ Serving static files
+ Modular & readable code
+
+
+
+
 
 
 

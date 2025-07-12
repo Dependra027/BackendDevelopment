@@ -34,7 +34,17 @@ dotenv.config();
 
 //* 2nd method- just import the db file and connect
 
-connectDB();
+connectDB()
+.then(()=>{
+    app.listen(process.env.PORT || 8000, ()=>{
+        console.log(`server is running on port: ${process.env.PORT}`);
+    })
+})
+.catch((error)=>{
+    console.error("Error", error);
+})
+
+
 
 
 
