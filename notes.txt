@@ -589,8 +589,275 @@ app.use(express.static("public")); // Serves static files
  Modular & readable code
 
 
+//* User and video model with hooks and JWT
+create a User.modal.js, video.model.js in models folder
 
 
+Using `mongoose-aggregate-paginate-v2` for Pagination in Mongoose
+
+📌 Installation
+npm install mongoose-aggregate-paginate-v2
+
+📁 Setup
+
+1. Import and Apply the Plugin to Your Schema
+
+const mongooseAggregatePaginate = require('mongoose-aggregate-paginate-v2');
+// Apply plugin to schema
+YourSchema.plugin(mongooseAggregatePaginate);
+
+🔄 Pagination with Aggregation
+
+Pagination using this plugin involves **two main steps**:
+
+1. Build Aggregation Pipeline
+
+   * Define your aggregation stages (e.g., `$match`, `$lookup`, `$sort`, `$project`, etc.)
+   const pipeline = [
+     { $match: { status: 'active' } },
+     { $sort: { createdAt: -1 } }
+     // Add more stages as needed
+   ];
+
+2. **Define Pagination Options**
+
+   * Options like page number, limit, and custom labels
+
+   const options = {
+     page: 1,
+     limit: 10,
+     customLabels: {
+       totalDocs: 'totalItems',
+       docs: 'itemsList',
+       limit: 'perPage',
+       page: 'currentPage',
+       nextPage: 'next',
+       prevPage: 'prev',
+       totalPages: 'pageCount',
+       pagingCounter: 'slNo',
+       meta: 'paginator'
+     }
+   };
+   
+ 🧪 Example Usage
+
+YourModel.aggregatePaginate(YourModel.aggregate(pipeline), options)
+  .then((result) => {
+    console.log(result);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+
+📚 Learn More
+
+You can read more about aggregation in the official MongoDB docs:
+👉 [https://www.mongodb.com/docs/manual/aggregation/](https://www.mongodb.com/docs/manual/aggregation/)
+
+And more on the plugin here:
+👉 [https://www.npmjs.com/package/mongoose-aggregate-paginate-v2](https://www.npmjs.com/package/mongoose-aggregate-paginate-v2)
+
+** bcrypt
+node.bcrypt.js
+library used to help you hash passwords
+
+npm i bcrypt
+
+**JWT(json web token)
 
 
+A JSON Web Token (JWT) is a compact, self-contained way to securely transmit information between parties as a JSON object. It’s digitally signed, so the receiver can verify the data’s integrity and authenticity. JWTs are commonly signed using either:
+
+* A **shared secret** with HMAC (e.g., HS256), or
+* A **public/private key pair** with RSA or ECDSA.
+
+ Why use JWT?
+
+Authorization: After logging in, a JWT is sent with each request to authenticate the user and control access to resources. It’s widely used in Single Sign-On (SSO) because JWTs are lightweight and work well across domains.
+
+Information Exchange: JWTs can securely transmit data because the signature ensures the data wasn’t tampered with and confirms the sender’s identity.
+
+***JWT Structure
+
+A JWT has **three parts**, each Base64Url encoded and separated by dots (`.`):
+
+```
+xxxxx.yyyyy.zzzzz
+```
+
+1. **Header:**
+   Contains metadata about the token, like the type (`JWT`) and signing algorithm (e.g., `HS256`):
+
+   
+   {
+     "alg": "HS256",
+     "typ": "JWT"
+   }
+   
+
+2. **Payload:**
+   Contains **claims** — statements about an entity (usually the user) and additional data. There are three types of claims:
+
+ Registered claims:** Predefined, recommended claims like `iss` (issuer), `exp` (expiration), `sub` (subject), and `aud` (audience).
+   
+ Public claims:** Custom claims defined by users but registered to avoid collisions.
+
+ Private claims:** Custom claims agreed upon by parties but not registered or public.
+
+   Example:
+
+   {
+     "sub": "1234567890",
+     "name": "John Doe",
+     "admin": true
+   }
+   
+
+   *Important: The payload is readable by anyone since it’s only Base64Url encoded, not encrypted. Don’t put secrets here unless you encrypt the JWT.
+
+3. Signature:
+   Created by signing the encoded header and payload with a secret or private key using the specified algorithm, e.g., HMAC SHA256:
+
+   ```
+   HMACSHA256(
+     base64UrlEncode(header) + "." +
+     base64UrlEncode(payload),
+     secret)
+   ```
+
+   This signature verifies the token’s integrity and authenticity.
+
+//lets install bcrypt  and jsonwebtoken
+npm install bcrypt jsonwebtoken
+//lets create a user model
+import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
+
+we can not directly bcrypt, so we use pre hook
+
+jwt is a beared token means which person have jwt,he/she get the data only
+
+//* lets create tokens in .env file
+then generate them in user.models.js with help of jwt.sign({payload},accessToken,object)
+
+//*file uploading
+woking with cloudinary- it is a cloud service
+// lets install cloudinary
+npm install cloudinary
+-> create a cloudinary.js in utils folder
+
+// Cloudinary Utility Notes
+// -----------------------------------------------------
+// Cloudinary is a cloud-based service for managing images and videos, providing storage, transformation, and delivery.
+// We use it to offload media storage from our server, enabling scalable and efficient media handling.
+//
+// The cloudinary.js utility sets up and exports a helper function to upload files to Cloudinary.
+// Configuration uses environment variables for security and flexibility:
+//   - CLOUDINARY_CLOUD_NAME
+//   - CLOUDINARY_API_KEY
+//   - CLOUDINARY_API_SECRET
+//
+// Usage:
+//   import { uploadOnCloudinary } from '../utils/cloudinary';
+//   const result = await uploadOnCloudinary(localFilePath);
+//
+// The function uploadOnCloudinary(localFilePath):
+//   - Uploads a local file to Cloudinary (images, videos, etc.)
+//   - Returns the Cloudinary response object if successful, or null if failed
+//   - On error, removes the local temp file to avoid clutter
+//
+// Example:
+//   const response = await uploadOnCloudinary('/path/to/file.jpg');
+//   if (response) {
+//     console.log('File uploaded:', response.url);
+//   }
+//
+// The utility uses 'resource_type: auto' to allow uploading images, videos, and other file types automatically.
+//
+// Make sure to install the cloudinary package:
+//   npm install cloudinary
+//
+// And set the required environment variables in your .env file.
+
+
+we will upload the file using multer
+// lets install multer
+npm install multer
+
+we make middleware using multer
+
+// Multer Middleware Notes
+// =======================
+// Multer is a node.js middleware for handling multipart/form-data, primarily used for uploading files.
+// It's written on top of busboy for maximum efficiency and adds file objects to the request.
+//
+// Key Points:
+// - Only processes multipart/form-data forms
+// - Adds 'file' or 'files' object to req object
+// - Adds 'body' object containing text fields to req object
+//
+// Installation:
+//   npm install multer
+//
+// Configuration in multer.middleware.js:
+// -------------------------------------
+// 1. Disk Storage Setup:
+//    - destination: Function that determines where to store uploaded files
+//    - filename: Function that determines the name of uploaded files
+//    - Uses ./public/temp as temporary storage before cloud upload
+//
+// 2. Multer Instance:
+//    - Configured with disk storage
+//    - Can add limits, fileFilter, and other options
+//
+// Usage Examples:
+// --------------
+// Single file upload:
+//   router.post('/upload', upload.single('avatar'), (req, res) => {
+//     // req.file contains the uploaded file
+//     // req.body contains the text fields
+//   });
+//
+// Multiple files upload:
+//   router.post('/upload', upload.array('photos', 5), (req, res) => {
+//     // req.files contains array of uploaded files
+//     // req.body contains the text fields
+//   });
+//
+// Multiple fields with different file counts:
+//   router.post('/upload', upload.fields([
+//     { name: 'avatar', maxCount: 1 },
+//     { name: 'gallery', maxCount: 8 }
+//   ]), (req, res) => {
+//     // req.files.avatar[0] - single file
+//     // req.files.gallery - array of files
+//   });
+//
+// File Object Properties:
+// ----------------------
+// When a file is uploaded, req.file contains:
+// - fieldname: Form field name
+// - originalname: Original file name
+// - encoding: File encoding
+// - mimetype: MIME type of file
+// - size: File size in bytes
+// - destination: Where file was saved
+// - filename: Name of file on disk
+// - path: Full path to file
+//
+// Important Notes:
+// ---------------
+// 1. Always clean up temporary files after uploading to cloud storage
+// 2. The ./public/temp directory should exist or be created
+// 3. Consider adding file type validation in fileFilter
+// 4. Set appropriate file size limits for your use case
+// 5. This middleware should be used before your route handler
+// 6. Works together with Cloudinary for cloud storage
+//
+// Typical Workflow:
+// 1. File uploaded via multer to ./public/temp
+// 2. File processed/validated in route handler
+// 3. File uploaded to Cloudinary using cloudinary utility
+// 4. Temporary file deleted from ./public/temp
+// 5. Cloudinary URL stored in database
 
